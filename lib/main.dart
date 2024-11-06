@@ -49,10 +49,21 @@ void main() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     if (message.notification != null) {
       await PushNotifications.onForegroundNotificationTapped(
-          message, 
+        message,
       );
     }
   });
+
+  // for handling in terminated state
+  final RemoteMessage? message =
+      await FirebaseMessaging.instance.getInitialMessage();
+
+  if (message != null) {
+    print('Lunched from terminated screen');
+    Future.delayed(const Duration(seconds: 2), () {
+      navigatorKey.currentState!.pushNamed("/data-screen", arguments: message);
+    });
+  }
 
   runApp(const MyApp());
 }
@@ -65,7 +76,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Flutter Demo',
+      title: 'Notifications',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
