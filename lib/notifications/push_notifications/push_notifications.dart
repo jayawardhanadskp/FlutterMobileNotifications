@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 
 class PushNotifications {
   // create and instance of firebase messeging plugin
@@ -33,4 +34,15 @@ class PushNotifications {
       print('background Message: ${message.notification!.title}');
     }
   }
+
+  // on background notification tapped function
+static Future<void> onBackgroundNotificationTapped(
+    RemoteMessage message, GlobalKey<NavigatorState> navigatorKey) async {
+  if (navigatorKey.currentState != null) {
+    navigatorKey.currentState!.pushNamed("/data-screen", arguments: message);
+  } else {
+    print("NavigatorState is null, cannot navigate.");
+  }
+}
+
 }
