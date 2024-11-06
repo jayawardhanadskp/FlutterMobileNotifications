@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:notification_app/notifications/local_notifications/local_notifications.dart';
 
 class PushNotifications {
   // create and instance of firebase messeging plugin
@@ -36,13 +39,30 @@ class PushNotifications {
   }
 
   // on background notification tapped function
-static Future<void> onBackgroundNotificationTapped(
-    RemoteMessage message, GlobalKey<NavigatorState> navigatorKey) async {
-  if (navigatorKey.currentState != null) {
-    navigatorKey.currentState!.pushNamed("/data-screen", arguments: message);
-  } else {
-    print("NavigatorState is null, cannot navigate.");
+  static Future<void> onBackgroundNotificationTapped(
+      RemoteMessage message, GlobalKey<NavigatorState> navigatorKey) async {
+    if (navigatorKey.currentState != null) {
+      navigatorKey.currentState!.pushNamed("/data-screen", arguments: message);
+    } else {
+      print("NavigatorState is null, cannot navigate.");
+    }
   }
-}
 
+  // handle foreground notification
+  static Future<void> onForegroundNotificationTapped(
+    RemoteMessage message,
+  ) async {
+    String payload = jsonEncode(message.data);
+    print('got the message in foreground');
+
+    if (message.notification != null) {
+      await LocalNotificationsService.showLocalNotificationWithPayload(
+        title: message.notification!.title!,
+        body: message.notification!.body!,
+        payload: payload,
+      );
+
+      
+    }
+  }
 }

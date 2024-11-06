@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notification_app/main.dart';
 import 'package:notification_app/utils/util_functions.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -7,9 +9,15 @@ class LocalNotificationsService {
   static final FlutterLocalNotificationsPlugin
       _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  // implement response logic
+  // implement response logic  (IMPLEMENTED LOGIC FOR FOREGROUND MESSAGE TAPED NAVIGATION)
   static Future<void> onDidReceiveBackgroundNotificationResponse(
-      NotificationResponse notificationResponse) async {}
+    NotificationResponse notificationResponse,
+    ) async {
+        await navigatorKey.currentState!.pushNamed(
+        "/data-screen",
+        arguments: notificationResponse,
+      );
+      }
 
   // initialize the notification
   static Future<void> init() async {
@@ -152,11 +160,11 @@ class LocalNotificationsService {
           priority: Priority.high,
           styleInformation: bigPictureStyleInformation),
       iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-          attachments: [DarwinNotificationAttachment(imageUrl)],
-          ),
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        attachments: [DarwinNotificationAttachment(imageUrl)],
+      ),
     );
 
     // show notifification
@@ -165,6 +173,43 @@ class LocalNotificationsService {
       title,
       body,
       platformChannelSpecifications,
+    );
+  }
+
+  Future cancelNotification() async {
+    await _flutterLocalNotificationsPlugin.cancelAll();
+  }
+
+  // SHOW A NOTIFICATION (instant notification) with a payload (USE FOR FOREGROUND PUSH NOTOFICATION)----------------------
+  static Future<void> showLocalNotificationWithPayload({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    // define the notification details
+    const NotificationDetails platformChannelSpecifications =
+        NotificationDetails(
+            // define android notification details
+            android: AndroidNotificationDetails(
+              "channelId",
+              "channelName",
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+
+            // define ios notificaion details
+            iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ));
+
+    await _flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifications,
+      payload: payload,
     );
   }
 }

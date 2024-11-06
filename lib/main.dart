@@ -33,14 +33,24 @@ void main() async {
     PushNotifications.onBackgroundMessage,
   );
 
-   // Set up background message handler-----------------------------------------
-     FirebaseMessaging.onBackgroundMessage(PushNotifications.onBackgroundMessage);
+  // Set up background message handler-----------------------------------------
+  FirebaseMessaging.onBackgroundMessage(PushNotifications.onBackgroundMessage);
 
-  // on background notification tapped 
+  // on background notification tapped
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     if (message.notification != null) {
       print('backgroun message tapped');
-      await PushNotifications.onBackgroundNotificationTapped(message, navigatorKey);
+      await PushNotifications.onBackgroundNotificationTapped(
+          message, navigatorKey);
+    }
+  });
+
+  // on foreground notification tapped
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    if (message.notification != null) {
+      await PushNotifications.onForegroundNotificationTapped(
+          message, 
+      );
     }
   });
 
